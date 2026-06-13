@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpeakTogether — Get Started</title>
+  <link rel="icon" href="data:,">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #F8F9FD;
+      --surface: #FFFFFF;
+      --border: #E8EDF5;
+      --primary: #FF5A36;
+      --primary-light: #FF8D75;
+      --accent: #20C997;
+      --accent-light: #E8FAF4;
+      --gold: #FECA57;
+      --dark: #1E293B;
+      --text: #334155;
+      --text-muted: #64748B;
+      --gradient: linear-gradient(135deg, #FF5A36 0%, #FF7B54 100%);
+      --glow: rgba(255, 90, 54, 0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif; background-color: var(--bg);
+      color: var(--text); min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(circle at top right, rgba(255,90,54,0.06) 0%, transparent 45%),
+                  radial-gradient(circle at bottom left, rgba(32,201,151,0.05) 0%, transparent 40%);
+    }
+
+    .back-link {
+      position: fixed; top: 24px; left: 28px;
+      display: flex; align-items: center; gap: 8px;
+      color: var(--text-muted); text-decoration: none; font-size: 0.88rem;
+      font-weight: 600; transition: color 0.2s; z-index: 10;
+    }
+    .back-link:hover { color: var(--primary); }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px; padding: 40px; width: 100%; max-width: 440px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.03);
+      animation: fade-up 0.5s ease both;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header { margin-bottom: 24px; text-align: center; }
+
+    .card-header .icon-wrap {
+      width: 60px; height: 60px; border-radius: 18px;
+      background: rgba(255, 90, 54, 0.08); border: 1px solid rgba(255, 90, 54, 0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; color: var(--primary);
+      margin: 0 auto 16px;
+    }
+
+    .card-header h1 {
+      font-family: 'Outfit', sans-serif; font-weight: 800;
+      font-size: 1.5rem; letter-spacing: -0.02em; margin-bottom: 8px;
+      color: var(--dark);
+    }
+    .card-header p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; }
+
+    /* Hidden states for steps */
+    .step-section { display: none; }
+    .step-section.active { display: block; }
+
+    /* Google Button */
+    .google-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center;
+      gap: 12px; background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; font-family: 'Outfit', sans-serif;
+      font-weight: 700; font-size: 0.95rem; color: var(--dark); cursor: pointer;
+      transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      margin-bottom: 20px;
+    }
+    .google-btn:hover { background: var(--bg); border-color: var(--primary-light); }
+    .google-btn img { width: 18px; height: 18px; }
+
+    .divider {
+      display: flex; align-items: center; text-align: center;
+      color: var(--text-light); font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; margin: 20px 0;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; border-bottom: 1px solid var(--border);
+    }
+    .divider:not(:empty)::before { margin-right: .5em; }
+    .divider:not(:empty)::after { margin-left: .5em; }
+
+    /* Fields */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 8px;
+    }
+    .field input {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 13px 16px; color: var(--dark);
+      font-family: 'Inter', sans-serif; font-size: 0.95rem;
+      outline: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .field input::placeholder { color: #A0AEC0; }
+    .field input:focus { border-color: var(--primary-light); background: #fff; }
+
+    /* OTP Inputs */
+    .otp-grid { display: flex; justify-content: space-between; gap: 10px; margin: 16px 0 24px; }
+    .otp-input {
+      width: 50px; height: 50px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--bg); text-align: center; font-size: 1.25rem; font-weight: 800;
+      color: var(--dark); outline: none; transition: all 0.2s;
+    }
+    .otp-input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 4px 12px var(--glow); }
+
+    /* Level picker */
+    .level-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
+    }
+
+    .level-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+    .level-option { position: relative; }
+    .level-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+    .level-btn {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 20px; border: 1px solid var(--border);
+      border-radius: 14px; background: var(--surface);
+      cursor: pointer; transition: all 0.2s;
+      user-select: none;
+    }
+    .level-btn:hover { border-color: var(--primary-light); transform: translateY(-2px); }
+
+    .level-option input:checked + .level-btn {
+      border-color: var(--primary); background: rgba(255, 90, 54, 0.04);
+    }
+
+    .level-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+
+    .level-option:nth-child(1) .level-icon { background: rgba(32, 201, 151, 0.1); color: var(--accent); }
+    .level-option:nth-child(2) .level-icon { background: rgba(33, 150, 243, 0.1); color: #2196F3; }
+    .level-option:nth-child(3) .level-icon { background: rgba(255, 90, 54, 0.1); color: var(--primary); }
+
+    .level-info { flex: 1; }
+    .level-name {
+      font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem;
+      color: var(--dark); margin-bottom: 2px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .level-badge { font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 100px; }
+    .level-badge.voice { background: rgba(32, 201, 151, 0.1); color: var(--accent); }
+    .level-badge.video { background: rgba(255, 90, 54, 0.1); color: var(--primary); }
+
+    .level-desc { font-size: 0.78rem; color: var(--text-muted); }
+
+    .check-icon {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--primary); color: #fff; font-size: 0.6rem;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s; flex-shrink: 0;
+    }
+    .level-option input:checked ~ .check-icon { opacity: 1; }
+
+    /* Daily time info */
+    .time-info {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 18px; border-radius: 12px;
+      background: rgba(255, 90, 54, 0.05); border: 1px solid rgba(255, 90, 54, 0.1);
+      margin-bottom: 24px; font-size: 0.82rem; color: var(--primary);
+    }
+    .time-info i { font-size: 1rem; }
+
+    /* CTA */
+    .cta-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center;
+      gap: 10px; background: var(--gradient); color: #fff;
+      font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.05rem;
+      padding: 16px; border-radius: 14px; border: none; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px var(--glow);
+    }
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(255, 90, 54, 0.3);
+    }
+
+    .note { text-align: center; margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Alert / Toast */
+    .auth-toast {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--dark); color: #fff; padding: 12px 24px; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 600; box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+      z-index: 1000; display: none; align-items: center; gap: 8px;
+    }
+
+    @media (max-width: 500px) {
+      .card { padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="back-link" href="index.html"><i class="fas fa-arrow-left"></i> Home</a>
+
+  <!-- TOAST NOTIFICATION FOR OTP -->
+  <div class="auth-toast" id="authToast"><i class="fas fa-key"></i> <span id="toastMsg">Code sent!</span></div>
+
+  <div class="card">
+    
+    <!-- STEP 0: LOADING -->
+    <div class="step-section active" id="stepLoading" style="text-align: center; padding: 40px 0;">
+      <i class="fas fa-circle-notch" style="animation: spin 0.7s linear infinite; font-size: 2rem; color: var(--primary);"></i>
+      <p style="margin-top: 16px; color: var(--text-muted); font-size: 0.9rem;">Loading your profile...</p>
+    </div>
+
+    <!-- STEP 1: AUTHENTICATION -->
+    <div class="step-section" id="stepAuth">
+      <div class="card-header">
+        <div class="icon-wrap"><i class="fas fa-user-lock"></i></div>
+        <h1>Create Account</h1>
+        <p>Verify your details to start real-time matches with learners worldwide.</p>
+      </div>
+
+      <!-- Google Log In -->
+      <button class="google-btn" onclick="continueWithGoogle()">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+        Continue with Google
+      </button>
+
+      <div class="divider">or use mobile number</div>
+
+      <!-- Phone Log In -->
+      <div class="field">
+        <label for="phoneNumber">Mobile Number</label>
+        <input type="tel" id="phoneNumber" placeholder="e.g. +91 9876543210" maxlength="15" autocomplete="off">
+      </div>
+
+      <button class="cta-btn" onclick="sendOTP()">
+        <i class="fas fa-paper-plane"></i> Send OTP
+      </button>
+    </div>
+
+    <!-- STEP 1.5: OTP VERIFICATION -->
+    <div class="step-section" id="stepOTP">
+      <div class="card-header">
+        <div class="icon-wrap"><i class="fas fa-sms"></i></div>
+        <h1>Verify Code</h1>
+        <p id="otpSubText">We sent a verification code to your mobile.</p>
+      </div>
+
+      <div class="otp-grid">
+        <input type="text" class="otp-input" maxlength="1" onkeyup="moveFocus(this, 'otp2')" id="otp1">
+        <input type="text" class="otp-input" maxlength="1" onkeyup="moveFocus(this, 'otp3')" id="otp2">
+        <input type="text" class="otp-input" maxlength="1" onkeyup="moveFocus(this, 'otp4')" id="otp3">
+        <input type="text" class="otp-input" maxlength="1" onkeyup="verifyCode()" id="otp4">
+      </div>
+
+      <button class="cta-btn" onclick="verifyOTPManual()">
+        <i class="fas fa-shield-alt"></i> Verify & Continue
+      </button>
+      
+      <p class="note" style="cursor:pointer" onclick="backToAuth()"><i class="fas fa-arrow-left"></i> Change Number</p>
+    </div>
+
+    <!-- STEP 2: PROFILE ONBOARDING -->
+    <div class="step-section" id="stepProfile">
+      <div class="card-header">
+        <div class="icon-wrap"><i class="fas fa-headphones"></i></div>
+        <h1>Start Practice</h1>
+        <p>Set your name and select your practice level to match.</p>
+      </div>
+
+      <div class="field">
+        <label for="username">Your Name</label>
+        <input type="text" id="username" placeholder="e.g. Priya" maxlength="30" autocomplete="off">
+      </div>
+
+      <p class="level-label">Practice Level</p>
+      <div class="level-grid">
+        <div class="level-option">
+          <input type="radio" name="level" id="beginner" value="Beginner" checked>
+          <label class="level-btn" for="beginner">
+            <div class="level-icon"><i class="fas fa-seedling"></i></div>
+            <div class="level-info">
+              <div class="level-name">Beginner <span class="level-badge voice">Voice Only</span></div>
+              <div class="level-desc">Basic words & simple sentences</div>
+            </div>
+          </label>
+          <span class="check-icon"><i class="fas fa-check"></i></span>
+        </div>
+
+        <div class="level-option" id="opt-intermediate">
+          <input type="radio" name="level" id="intermediate" value="Intermediate">
+          <label class="level-btn" for="intermediate">
+            <div class="level-icon"><i class="fas fa-book-open"></i></div>
+            <div class="level-info">
+              <div class="level-name">Intermediate <span class="level-badge voice">Voice Only</span></div>
+              <div class="level-desc">Can hold basic conversations</div>
+            </div>
+          </label>
+          <span class="check-icon"><i class="fas fa-check"></i></span>
+        </div>
+
+        <div class="level-option" id="opt-advanced">
+          <input type="radio" name="level" id="advanced" value="Advanced">
+          <label class="level-btn" for="advanced">
+            <div class="level-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="level-info">
+              <div class="level-name">Advanced <span class="level-badge video">Video Enabled</span></div>
+              <div class="level-desc">Fluent, full face-to-face video</div>
+            </div>
+          </label>
+          <span class="check-icon"><i class="fas fa-check"></i></span>
+        </div>
+      </div>
+
+      <div class="time-info">
+        <i class="fas fa-clock"></i>
+        <span>Free users get 5 minutes of daily practice time</span>
+      </div>
+
+      <button class="cta-btn" onclick="proceed()">
+        <i class="fas fa-play"></i> Start Practice
+      </button>
+    </div>
+
+    <p class="note">Secure OTP · Firebase · Your data saved on MongoDB</p>
+  </div>
+
+  <!-- Load Firebase auth module -->
+  <script src="auth.js" type="module"></script>
+
+  <script>
+    let userPhone = '';
+
+    // ── AUTH GUARD + Initial State ──
+    document.addEventListener('DOMContentLoaded', () => {
+      const d = JSON.parse(localStorage.getItem('st_dashboard') || '{}');
+      const userLvl = d.userLevel || 1;
+
+      // Lock Intermediate (Level 3 required)
+      if (userLvl < 3) {
+        const interInput = document.getElementById('intermediate');
+        const interOpt = document.getElementById('opt-intermediate');
+        interInput.disabled = true;
+        interOpt.style.opacity = '0.5';
+        const icon = interOpt.querySelector('.level-icon i');
+        if (icon) icon.className = 'fas fa-lock';
+        interOpt.addEventListener('click', (e) => {
+          if (interInput.disabled) showToast('🔒 Reach Level 3 to unlock Intermediate.');
+        });
+      }
+
+      // Lock Advanced (Level 5 required)
+      if (userLvl < 5) {
+        const advInput = document.getElementById('advanced');
+        const advOpt = document.getElementById('opt-advanced');
+        advInput.disabled = true;
+        advOpt.style.opacity = '0.5';
+        const icon = advOpt.querySelector('.level-icon i');
+        if (icon) icon.className = 'fas fa-lock';
+        advOpt.addEventListener('click', (e) => {
+          if (advInput.disabled) showToast('🔒 Reach Level 5 to unlock Advanced video calls.');
+        });
+      } else {
+        // Auto-unlock Advanced styling
+        const advBadge = document.querySelector('#opt-advanced .level-badge.video');
+        if (advBadge) {
+          advBadge.textContent = '🏆 Unlocked!';
+          advBadge.style.background = 'rgba(32, 201, 151, 0.1)';
+          advBadge.style.color = 'var(--accent)';
+        }
+      }
+
+      // Wait for auth.js module to load, then check auth state
+      setTimeout(() => {
+        if (window.SpeakAuth && window.SpeakAuth.isAuthenticated()) {
+          // Already logged in via Firebase+JWT
+          const user = window.SpeakAuth.getUser();
+          showSection('stepProfile');
+          if (user?.displayName) document.getElementById('username').value = user.displayName;
+          else if (d.name) document.getElementById('username').value = d.name;
+        } else {
+          // If not logged in, redirect to index.html to show modal
+          window.location.href = 'index.html?login=1';
+        }
+      }, 400);
+    });
+
+    function showSection(sectionId) {
+      document.querySelectorAll('.step-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('authToast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.style.display = 'flex';
+      setTimeout(() => { toast.style.display = 'none'; }, 5000);
+    }
+
+    // ── GOOGLE AUTH (placeholder — requires Google provider setup in Firebase) ──
+    function continueWithGoogle() {
+      showToast('Google Sign-In: Open Login modal on homepage instead.');
+    }
+
+    // ── REAL Firebase Phone OTP ──
+    let selectedDialCode = '+91';
+
+    async function sendOTP() {
+      if (!window.SpeakAuth) {
+        showToast('Auth not loaded yet. Please refresh.'); return;
+      }
+      const phone = document.getElementById('phoneNumber').value.trim().replace(/\s/g, '');
+      if (!phone || phone.length < 7) {
+        alert('Please enter a valid mobile number.'); return;
+      }
+      // Prepend dial code if not present
+      const fullPhone = phone.startsWith('+') ? phone : (selectedDialCode + phone);
+      userPhone = fullPhone;
+
+      const btn = document.querySelector('#stepAuth .cta-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch" style="animation:spin 0.7s linear infinite"></i> Sending OTP...';
+      try {
+        await window.SpeakAuth.sendOTP(fullPhone);
+        document.getElementById('otpSubText').textContent = 'We sent a 6-digit code to ' + fullPhone;
+        showSection('stepOTP');
+        showToast('✅ OTP sent to ' + fullPhone);
+        document.getElementById('otp1').focus();
+      } catch (err) {
+        let msg = 'Could not send OTP. Check the number and try again.';
+        if (err.code === 'auth/invalid-phone-number') msg = 'Invalid phone number.';
+        if (err.code === 'auth/too-many-requests')    msg = 'Too many attempts. Please wait.';
+        alert(msg);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+      }
+    }
+
+    function backToAuth() { showSection('stepAuth'); }
+
+    function moveFocus(current, nextId) {
+      if (current.value.length === 1) {
+        const next = document.getElementById(nextId);
+        if (next) next.focus();
+      }
+    }
+
+    // Called when 4th box filled OR button clicked
+    async function verifyCode() {
+      const code = (document.getElementById('otp1').value +
+                    document.getElementById('otp2').value +
+                    document.getElementById('otp3').value +
+                    document.getElementById('otp4').value);
+      if (code.length === 4) await verifyOTPManual(code);
+    }
+
+    async function verifyOTPManual(codeOverride) {
+      if (!window.SpeakAuth) { alert('Auth not loaded. Refresh.'); return; }
+      const code = codeOverride || (
+        document.getElementById('otp1').value +
+        document.getElementById('otp2').value +
+        document.getElementById('otp3').value +
+        document.getElementById('otp4').value
+      );
+      if (code.length < 4) { alert('Please enter the full OTP.'); return; }
+
+      const btn = document.querySelector('#stepOTP .cta-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch" style="animation:spin 0.7s linear infinite"></i> Verifying...';
+      try {
+        // a.html uses 4-digit boxes but Firebase sends 6-digit — user must type all 6
+        // For a.html's 4-box layout we show a notice — ideally redirect to index OTP modal
+        const { user } = await window.SpeakAuth.verifyOTP(code);
+        showToast('✅ Verification Successful! Welcome, ' + (user.displayName || 'Learner'));
+        const d = JSON.parse(localStorage.getItem('st_dashboard') || '{}');
+        d.authenticated = true;
+        d.phone         = user.phone;
+        d.xp            = user.xp           ?? d.xp;
+        d.streak        = user.currentStreak ?? d.streak;
+        localStorage.setItem('st_dashboard', JSON.stringify(d));
+        setTimeout(() => { showSection('stepProfile'); }, 1200);
+      } catch (err) {
+        alert('Incorrect OTP or expired. Please try again.');
+        document.querySelectorAll('.otp-input').forEach(i => i.value = '');
+        document.getElementById('otp1').focus();
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-shield-alt"></i> Verify & Continue';
+      }
+    }
+
+    // ── PROCEED TO MATCHMAKING ──
+    async function proceed() {
+      const name  = document.getElementById('username').value.trim();
+      const level = document.querySelector('input[name="level"]:checked');
+      if (!name)  { alert('Please enter your name.');          return; }
+      if (!level) { alert('Please select your English level.'); return; }
+
+      const d = JSON.parse(localStorage.getItem('st_dashboard') || '{}');
+      d.name = name;
+      localStorage.setItem('st_dashboard', JSON.stringify(d));
+
+      // Sync name to server if logged in
+      if (window.SpeakAuth && window.SpeakAuth.isAuthenticated()) {
+        const token = window.SpeakAuth.getToken();
+        fetch('/api/auth/profile', {
+          method : 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body   : JSON.stringify({ displayName: name }),
+        }).catch(() => {});
+      }
+
+      sessionStorage.setItem('st_username', name);
+      sessionStorage.setItem('st_level',    level.value);
+      // Pass JWT to session page
+      if (window.SpeakAuth) sessionStorage.setItem('st_jwt', window.SpeakAuth.getToken() || '');
+
+      window.location.href = 'n.html';
+    }
+
+    // CSS spin keyframe for inline spinners
+    const _style = document.createElement('style');
+    _style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+    document.head.appendChild(_style);
+  </script>
+</body>
+</html>

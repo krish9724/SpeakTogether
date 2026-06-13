@@ -1,0 +1,29 @@
+{
+  "name": "speaktogether",
+  "version": "2.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "english",
+    "speaking",
+    "practice",
+    "webrtc",
+    "edtech"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "SpeakTogether — English Speaking Practice Platform",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.5.2",
+    "firebase-admin": "^11.11.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.0",
+    "socket.io": "^4.7.5"
+  }
+}

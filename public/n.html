@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpeakTogether — Practice Session</title>
+  <link rel="icon" href="data:,">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="session.css">
+</head>
+<body>
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <a class="topbar-brand" href="index.html">
+      <div class="brand-icon"><i class="fas fa-language"></i></div>
+      SpeakTogether
+    </a>
+    <div class="mode-badge" id="modeBadge">Loading...</div>
+    <div class="topic-chip" id="topicChip">
+      <i class="fas fa-comment-dots"></i> 
+      <span id="topicDisplay">Loading topic...</span>
+    </div>
+    <div class="topbar-right">
+      <div class="timer-pill" id="timerPill"><i class="fas fa-clock"></i> <span id="sessionTimer">00:00</span></div>
+      <div class="level-pill" id="levelPill"><i class="fas fa-signal"></i> <span id="levelDisplay">—</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="video-panel">
+      <!-- Voice Mode banner -->
+      <div class="voice-banner hidden" id="voiceBanner">
+        <i class="fas fa-info-circle"></i>
+        <span>Audio-only mode. Reach Level 5 to unlock video!</span>
+      </div>
+
+      <div class="remote-wrap">
+        <video id="remoteVideo" autoplay playsinline></video>
+        
+        <!-- Voice Avatar for Remote Partner -->
+        <div class="voice-avatar-container" id="remoteVoiceAvatar">
+          <div class="avatar-circle">
+            <img id="partnerAvatarImg" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Partner" alt="Avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid transparent;">
+          </div>
+          <div class="voice-waveform">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p class="voice-avatar-name" id="partnerAvatarName">Partner</p>
+        </div>
+
+        <div class="loader-overlay" id="loaderOverlay">
+          <div class="spinner"></div>
+          <p id="loaderText">Finding a practice partner...</p>
+        </div>
+        <div class="remote-label"><i class="fas fa-circle"></i><span id="partnerName">Partner</span></div>
+      </div>
+
+      <div class="local-wrap">
+        <video id="localVideo" autoplay muted playsinline></video>
+        
+        <!-- Voice Avatar for Local User -->
+        <div class="voice-avatar-container" id="localVoiceAvatar">
+          <div class="avatar-circle">
+            <img id="localAvatarImg" src="https://api.dicebear.com/7.x/adventurer/svg?seed=You" alt="Avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid transparent;">
+          </div>
+        </div>
+
+        <div class="you-label">You</div>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn" id="muteBtn" title="Mute" onclick="toggleMute()"><i class="fas fa-microphone" id="muteIcon"></i></button>
+        <button class="ctrl-btn" id="camBtn" title="Camera" onclick="toggleCamera()"><i class="fas fa-video" id="camIcon"></i></button>
+        <button class="ctrl-btn danger" id="endBtn" title="End Call" onclick="endCall()"><i class="fas fa-phone-slash"></i></button>
+        <button class="btn-next" id="nextBtn" onclick="nextPartner()" style="display:none"><i class="fas fa-forward"></i> Next Partner</button>
+        <button class="ctrl-btn report" id="reportBtn" title="Report User" onclick="showReport()"><i class="fas fa-flag"></i></button>
+      </div>
+    </div>
+    <div class="chat-panel">
+      <div class="chat-header"><h3><i class="fas fa-comment-dots"></i> Chat</h3><span class="msg-count" id="msgCount">0</span></div>
+      <div class="messages" id="messages"></div>
+      <div class="chat-input-wrap">
+        <textarea id="messageInput" rows="1" placeholder="Type a message…"></textarea>
+        <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WARNING TOAST -->
+  <div class="toast" id="warningToast"></div>
+
+  <!-- TIME EXPIRED MODAL -->
+  <div class="modal-backdrop hidden" id="expiredModal">
+    <div class="modal">
+      <div class="modal-icon expired"><i class="fas fa-hourglass-end"></i></div>
+      <h2>Daily Practice Complete!</h2>
+      <p>Your daily 5-minute practice limit has ended. Upgrade to Premium for unlimited access!</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="window.location.href='index.html'">Back to Home</button>
+        <button class="btn-join" onclick="alert('Premium coming soon!')"><i class="fas fa-crown"></i> Upgrade — ₹99/mo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT MODAL -->
+  <div class="modal-backdrop hidden" id="reportModal">
+    <div class="modal">
+      <div class="modal-icon report-icon"><i class="fas fa-flag"></i></div>
+      <h2>Report User</h2>
+      <p>Select a reason for reporting this user.</p>
+      <div class="report-options">
+        <label class="report-opt"><input type="radio" name="report" value="inappropriate"> Inappropriate behavior</label>
+        <label class="report-opt"><input type="radio" name="report" value="harassment"> Harassment</label>
+        <label class="report-opt"><input type="radio" name="report" value="spam"> Spam or scam</label>
+        <label class="report-opt"><input type="radio" name="report" value="other"> Other</label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="hideReport()">Cancel</button>
+        <button class="btn-join danger-btn" onclick="submitReport()"><i class="fas fa-paper-plane"></i> Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK MODAL -->
+  <div class="modal-backdrop hidden" id="feedbackModal">
+    <div class="modal">
+      <div class="modal-icon feedback-ico"><i class="fas fa-star"></i></div>
+      <h2>Session Complete!</h2>
+      <p id="feedbackText">Great job practicing your English!</p>
+      
+      <div class="feedback-stats">
+        <div class="fb-stat"><div class="fb-num" id="fbTime">0:00</div><div class="fb-label">Duration</div></div>
+        <div class="fb-stat"><div class="fb-num" id="fbTotal">0</div><div class="fb-label">Total Sessions</div></div>
+        <div class="fb-stat"><div class="fb-num" id="fbStreak">0</div><div class="fb-label">Streak Days</div></div>
+      </div>
+
+      <div class="xp-progress-section">
+        <div class="xp-level-header">
+          <span class="xp-level-badge" id="fbLevel">Level 1</span>
+          <span id="fbXPText">10/100 XP</span>
+        </div>
+        <div class="xp-bar-bg">
+          <div class="xp-bar-fill" id="fbXPBar" style="width: 10%;"></div>
+        </div>
+        <p class="xp-lock-hint"><i class="fas fa-lock"></i> Reach <strong>Level 5</strong> to unlock Video Call Mode!</p>
+      </div>
+
+      <!-- Follow Partner Button -->
+      <div class="follow-action-wrap" id="fbFollowWrap" style="margin: 18px 0 8px;">
+        <button class="cta-btn" id="fbFollowBtn" onclick="followPartner()" style="background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px; font-size: 0.9rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 8px; justify-content: center; width: 100%; transition: all 0.2s; cursor: pointer;">
+          <i class="fas fa-user-plus" id="followIcon"></i> <span id="followText">Follow Partner</span>
+        </button>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="window.location.href='index.html'">Done</button>
+        <button class="btn-join" onclick="closeFeedback()"><i class="fas fa-redo"></i> Practice Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="session.js"></script>
+</body>
+</html>
