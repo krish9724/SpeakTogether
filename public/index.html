@@ -1634,29 +1634,29 @@
               const badgeIcon = item.followed ? 'fa-user-check' : 'fa-user-plus';
               
               return `
-                <div class="history-item" style="border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px; background:var(--surface); box-shadow:0 4px 12px rgba(0,0,0,0.03);">
-                  <div style="display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:12px;">
-                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(item.partnerName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffdfbf,ffd5dc" style="width:48px; height:48px; border-radius:50%; object-fit:cover;">
-                    <div style="flex:1;">
-                      <div style="font-weight:700; font-size:1rem; color:var(--bg-dark);">${item.partnerName}</div>
-                      <div style="font-size:0.75rem; color:var(--text-muted); display:flex; gap:8px; margin-top:4px;">
-                        <span><i class="fas fa-calendar-alt"></i> ${item.date}</span>
-                        <span><i class="fas fa-venus-mars"></i> Unknown</span>
+                <div class="history-item" style="position:relative; padding:16px; border:1px solid var(--border); border-radius:16px; background:var(--surface); margin-bottom:12px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+                  <!-- Top Profile Info -->
+                  <div style="display:flex; gap:12px; align-items:flex-start; margin-bottom:16px;">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(item.partnerName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffdfbf,ffd5dc" style="width:52px; height:52px; border-radius:50%; object-fit:cover; flex-shrink:0;">
+                    <div style="flex:1; padding-top:2px;">
+                      <div style="font-weight:700; font-size:1.05rem; color:var(--bg-dark);">${item.partnerName}</div>
+                      <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+                        <i class="fas fa-calendar-alt"></i> ${item.date} &nbsp;•&nbsp; <i class="fas fa-clock"></i> ${mm}:${ss}
                       </div>
                     </div>
-                    <div style="font-size:0.85rem; font-weight:700; color:var(--primary); background:rgba(255, 90, 54, 0.1); padding:4px 10px; border-radius:100px;">
-                      ${mm}:${ss}
-                    </div>
-                  </div>
-                  <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:space-between; margin-top:4px;">
-                    <button onclick="attemptChat('${item.partnerName}')" style="flex:1; min-width: 80px; padding:8px 4px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-weight:600; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; transition:0.2s;">
-                      <i class="fas fa-comment-dots" style="color:var(--primary)"></i> Message
-                    </button>
-                    <button class="${badgeClass}" onclick="toggleFollowInHistory(${idx})" style="flex:1; min-width: 90px; padding:8px 4px; border-radius:10px; border:none; background:${item.followed ? 'rgba(32, 201, 151, 0.1)' : 'var(--gradient)'}; color:${item.followed ? 'var(--accent)' : '#fff'}; font-weight:600; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; transition:0.2s;">
-                      <i class="fas ${badgeIcon}"></i> ${badgeText}
-                    </button>
-                    <button onclick="deleteCallHistoryUi(${idx})" style="width:38px; height:36px; flex-shrink:0; border-radius:10px; border:1px solid rgba(255, 77, 77, 0.2); background:rgba(255, 77, 77, 0.05); color:var(--danger); font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" title="Delete Record">
+                    <!-- Delete Icon (like the bell in Ace Fluency) -->
+                    <button onclick="deleteCallHistoryUi(${idx})" style="background:none; border:none; color:var(--text-light); font-size:1.1rem; cursor:pointer; padding:4px;" title="Delete Record">
                       <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- Bottom Action Buttons (Message & Follow Back) -->
+                  <div style="display:flex; gap:10px;">
+                    <button onclick="attemptChat('${item.partnerName}')" style="flex:1; padding:10px 0; border:1.5px solid var(--primary); background:var(--surface); color:var(--primary); font-weight:700; font-family:'Inter',sans-serif; font-size:0.9rem; border-radius:10px; display:flex; justify-content:center; align-items:center; gap:6px; cursor:pointer; transition:0.2s;">
+                      <i class="fas fa-comment-dots"></i> Message
+                    </button>
+                    <button class="${badgeClass}" onclick="toggleFollowInHistory(${idx})" style="flex:1; padding:10px 0; border:none; background:${item.followed ? 'rgba(32, 201, 151, 0.1)' : 'var(--primary)'}; color:${item.followed ? 'var(--accent)' : '#fff'}; font-weight:700; font-family:'Inter',sans-serif; font-size:0.9rem; border-radius:10px; display:flex; justify-content:center; align-items:center; gap:6px; cursor:pointer; transition:0.2s; box-shadow: ${item.followed ? 'none' : '0 4px 10px rgba(255,90,54,0.3)'};">
+                      <i class="fas ${badgeIcon}"></i> ${badgeText}
                     </button>
                   </div>
                 </div>
