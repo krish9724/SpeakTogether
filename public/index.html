@@ -986,11 +986,13 @@
       </div>
 
       <!-- Call History Log -->
-      <div class="history-section" style="margin-top: 10px; margin-bottom: 16px;">
-        <button class="cta-btn" onclick="openHistoryModal()" style="background: var(--bg); border: 1px solid var(--border); color: var(--dark); padding: 14px; font-size: 0.95rem; border-radius: 14px; font-weight: 700; display: inline-flex; align-items: center; justify-content: space-between; width: 100%; transition: all 0.2s; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-          <span style="display: flex; align-items: center; gap: 10px;"><i class="fas fa-history" style="color: var(--primary); font-size: 1.1rem;"></i> Call History</span>
-          <i class="fas fa-chevron-right" style="color: var(--text-muted); font-size: 0.9rem;"></i>
-        </button>
+      <div class="history-section" style="margin-top: 10px;">
+        <h4 style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-history" style="color: var(--primary);"></i> Call History
+        </h4>
+        <div id="historyLogList" style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 4px;">
+          <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 20px 0;">No sessions completed yet.</div>
+        </div>
       </div>
 
       <!-- Mobile Explore Navigation -->
@@ -1421,21 +1423,6 @@
     </div>
   </div>
 
-  <!-- Call History Modal -->
-  <div class="modal-backdrop" id="historyModal" style="display:none; position:fixed; inset:0; background:rgba(30, 41, 59, 0.6); backdrop-filter:blur(8px); z-index:1100; align-items:center; justify-content:center; padding:16px;">
-    <div style="background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:24px; width:100%; max-width:500px; max-height: 85vh; display: flex; flex-direction: column; box-shadow:0 20px 50px rgba(0,0,0,0.1); position:relative;">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px;">
-        <h2 style="font-family:'Outfit',sans-serif; font-weight:800; font-size:1.4rem; color:var(--bg-dark); margin:0; display:flex; align-items:center; gap:8px;">
-          <i class="fas fa-history" style="color:var(--primary);"></i> Call History
-        </h2>
-        <button onclick="closeHistoryModal()" style="background:none; border:none; font-size:1.5rem; color:var(--text-muted); cursor:pointer;"><i class="fas fa-times"></i></button>
-      </div>
-      <div id="historyModalList" style="overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 12px;">
-        <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 20px 0;">No sessions completed yet.</div>
-      </div>
-    </div>
-  </div>
-
   <!-- Premium Paywall Modal -->
   <div class="modal-backdrop" id="premiumModal" style="display:none; position:fixed; inset:0; background:rgba(30, 41, 59, 0.6); backdrop-filter:blur(8px); z-index:1100; align-items:center; justify-content:center; padding:24px;">
     <div style="background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:40px; width:100%; max-width:420px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.1); position:relative;">
@@ -1633,7 +1620,50 @@
         else if (lvl >= 4) rankName = 'Silver Speaker 🌟';
         rankBadge.innerHTML = `<i class="fas fa-trophy"></i> ${rankName}`;
 
-        // We don't render Call History list in drawer anymore.
+        // Render Call History
+        const historyLogList = document.getElementById('historyLogList');
+        if (historyLogList) {
+          if (!d.callHistory || d.callHistory.length === 0) {
+            historyLogList.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 20px 0;">No sessions completed yet.</div>`;
+          } else {
+            historyLogList.innerHTML = d.callHistory.map((item, idx) => {
+              const mm = Math.floor(item.duration / 60);
+              const ss = String(item.duration % 60).padStart(2, '0');
+              const badgeClass = item.followed ? 'followed' : '';
+              const badgeText = item.followed ? 'Following ✓' : 'Follow Back';
+              const badgeIcon = item.followed ? 'fa-user-check' : 'fa-user-plus';
+              
+              return `
+                <div class="history-item" style="border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px; background:var(--surface); box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+                  <div style="display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:12px;">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(item.partnerName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffdfbf,ffd5dc" style="width:48px; height:48px; border-radius:50%; object-fit:cover;">
+                    <div style="flex:1;">
+                      <div style="font-weight:700; font-size:1rem; color:var(--bg-dark);">${item.partnerName}</div>
+                      <div style="font-size:0.75rem; color:var(--text-muted); display:flex; gap:8px; margin-top:4px;">
+                        <span><i class="fas fa-calendar-alt"></i> ${item.date}</span>
+                        <span><i class="fas fa-venus-mars"></i> Unknown</span>
+                      </div>
+                    </div>
+                    <div style="font-size:0.85rem; font-weight:700; color:var(--primary); background:rgba(255, 90, 54, 0.1); padding:4px 10px; border-radius:100px;">
+                      ${mm}:${ss}
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:10px;">
+                    <button onclick="attemptChat('${item.partnerName}')" style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:0.2s;">
+                      <i class="fas fa-comment-dots" style="color:var(--primary)"></i> Message
+                    </button>
+                    <button class="${badgeClass}" onclick="toggleFollowInHistory(${idx})" style="flex:1; padding:10px; border-radius:10px; border:none; background:${item.followed ? 'rgba(32, 201, 151, 0.1)' : 'var(--gradient)'}; color:${item.followed ? 'var(--accent)' : '#fff'}; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:0.2s;">
+                      <i class="fas ${badgeIcon}"></i> ${badgeText}
+                    </button>
+                    <button onclick="deleteCallHistoryUi(${idx})" style="width:40px; border-radius:10px; border:1px solid rgba(255, 77, 77, 0.2); background:rgba(255, 77, 77, 0.05); color:var(--danger); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" title="Delete Record">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+        }
       } else {
         if (loggedOutArea) loggedOutArea.style.display = 'block';
         if (profileCard) profileCard.style.display = 'none';
@@ -1661,7 +1691,6 @@
         }
         localStorage.setItem('st_dashboard', JSON.stringify(d));
         renderDrawerStats();
-        renderHistoryModal();
       }
     }
 
@@ -1673,7 +1702,6 @@
       d.callHistory.splice(idx, 1);
       localStorage.setItem('st_dashboard', JSON.stringify(d));
       renderDrawerStats();
-      renderHistoryModal();
       
       // Delete on server
       if (window.SpeakAuth && window.SpeakAuth.isAuthenticated()) {
@@ -1682,69 +1710,6 @@
              console.error("Failed to delete history from server");
              // You could optionally refetch profile here to restore state
          }
-      }
-    }
-
-    function openHistoryModal() {
-      // Close drawer if it's open
-      const drawer = document.getElementById('profileDrawer');
-      const overlay = document.getElementById('drawerOverlay');
-      if (drawer && drawer.classList.contains('open')) {
-        drawer.classList.remove('open');
-        if (overlay) overlay.classList.remove('open');
-      }
-
-      renderHistoryModal();
-      document.getElementById('historyModal').style.display = 'flex';
-    }
-
-    function closeHistoryModal() {
-      document.getElementById('historyModal').style.display = 'none';
-    }
-
-    function renderHistoryModal() {
-      const d = loadDashboard();
-      const historyModalList = document.getElementById('historyModalList');
-      if (!historyModalList) return;
-
-      if (!d.callHistory || d.callHistory.length === 0) {
-        historyModalList.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 40px 0;"><i class="fas fa-history" style="font-size: 2rem; color: var(--border); margin-bottom: 12px; display: block;"></i>No sessions completed yet. Practice to fill this up!</div>`;
-      } else {
-        historyModalList.innerHTML = d.callHistory.map((item, idx) => {
-          const mm = Math.floor(item.duration / 60);
-          const ss = String(item.duration % 60).padStart(2, '0');
-          const badgeClass = item.followed ? 'followed' : '';
-          const badgeText = item.followed ? 'Following ✓' : 'Follow Back';
-          const badgeIcon = item.followed ? 'fa-user-check' : 'fa-user-plus';
-          
-          return `
-            <div class="history-item" style="border:1px solid var(--border); border-radius:18px; padding:16px; background:var(--surface); box-shadow:0 6px 16px rgba(0,0,0,0.03);">
-              <div style="display:flex; align-items:center; gap:12px; border-bottom:1px dashed var(--border); padding-bottom:14px; margin-bottom:14px;">
-                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(item.partnerName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffdfbf,ffd5dc" style="width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid var(--primary-light);">
-                <div style="flex:1;">
-                  <div style="font-weight:800; font-family:'Outfit',sans-serif; font-size:1.1rem; color:var(--dark);">${item.partnerName}</div>
-                  <div style="font-size:0.8rem; color:var(--text-muted); display:flex; gap:12px; margin-top:6px; font-weight: 500;">
-                    <span><i class="fas fa-calendar-alt" style="color:var(--text-light)"></i> ${item.date}</span>
-                  </div>
-                </div>
-                <div style="font-size:0.9rem; font-weight:800; color:var(--primary); background:rgba(255, 90, 54, 0.1); padding:6px 12px; border-radius:100px; display: flex; align-items: center; gap: 6px;">
-                  <i class="fas fa-clock"></i> ${mm}:${ss}
-                </div>
-              </div>
-              <div style="display:flex; gap:12px; align-items:center;">
-                <button onclick="attemptChat('${item.partnerName}')" style="width:48px; height:48px; flex-shrink:0; border-radius:14px; border:1px solid var(--border); background:var(--bg); color:var(--primary); font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s; box-shadow:0 4px 10px rgba(0,0,0,0.02);" title="Message">
-                  <i class="fas fa-comment-dots"></i>
-                </button>
-                <button class="${badgeClass}" onclick="toggleFollowInHistory(${idx})" style="flex:1; height:48px; border-radius:14px; border:none; background:${item.followed ? 'rgba(32, 201, 151, 0.1)' : 'var(--gradient)'}; color:${item.followed ? 'var(--accent)' : '#fff'}; font-weight:700; font-family:'Inter',sans-serif; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s; box-shadow: ${item.followed ? 'none' : '0 6px 16px var(--glow)'};">
-                  ${badgeText}
-                </button>
-                <button onclick="deleteCallHistoryUi(${idx})" style="width:48px; height:48px; flex-shrink:0; border-radius:14px; border:1px solid rgba(255, 77, 77, 0.2); background:rgba(255, 77, 77, 0.05); color:var(--danger); font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" title="Delete Record">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </div>
-            </div>
-          `;
-        }).join('');
       }
     }
 
