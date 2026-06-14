@@ -1490,10 +1490,24 @@
         if (drawerReal) { drawerReal.src = avatarData; drawerReal.style.display = 'block'; }
         if (drawerDummy) drawerDummy.style.display = 'none';
       } else {
-        if (navReal) { navReal.style.display = 'none'; navReal.src = ''; }
-        if (navDummy) navDummy.style.display = 'block';
-        if (drawerReal) { drawerReal.style.display = 'none'; drawerReal.src = ''; }
-        if (drawerDummy) drawerDummy.style.display = 'block';
+        const d = JSON.parse(localStorage.getItem('st_dashboard') || '{}');
+        const userGender = d.gender || 'other';
+        const userName = d.name || 'User';
+        let fallbackUrl = '';
+        if (userGender === 'male' || userGender === 'boy') fallbackUrl = `https://avatar.iran.liara.run/public/boy?username=${encodeURIComponent(userName)}`;
+        else if (userGender === 'female' || userGender === 'girl') fallbackUrl = `https://avatar.iran.liara.run/public/girl?username=${encodeURIComponent(userName)}`;
+
+        if (fallbackUrl) {
+          if (navReal) { navReal.src = fallbackUrl; navReal.style.display = 'block'; }
+          if (navDummy) navDummy.style.display = 'none';
+          if (drawerReal) { drawerReal.src = fallbackUrl; drawerReal.style.display = 'block'; }
+          if (drawerDummy) drawerDummy.style.display = 'none';
+        } else {
+          if (navReal) { navReal.style.display = 'none'; navReal.src = ''; }
+          if (navDummy) navDummy.style.display = 'block';
+          if (drawerReal) { drawerReal.style.display = 'none'; drawerReal.src = ''; }
+          if (drawerDummy) drawerDummy.style.display = 'block';
+        }
       }
     }
 

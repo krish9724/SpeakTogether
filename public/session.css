@@ -328,9 +328,9 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   .video-panel.voice-layout .local-wrap.voice-only .avatar-circle { width: 80px; height: 80px; font-size: 2.5rem; }
   .avatar-circle { width: 80px; height: 80px; font-size: 2.5rem; }
   .local-wrap { width: 100px; bottom: 80px; }
-  .controls { padding: 10px; gap: 6px; flex-wrap: wrap; }
-  .ctrl-btn { width: 40px; height: 40px; font-size: 0.9rem; }
-  .btn-next { height: 40px; padding: 0 16px; font-size: 0.85rem; }
+  .controls { padding: 10px 8px; gap: 6px; flex-wrap: nowrap; overflow: hidden; justify-content: center; }
+  .ctrl-btn { width: 40px; height: 40px; font-size: 0.9rem; flex-shrink: 0; }
+  .btn-next { height: 40px; padding: 0 12px; font-size: 0.8rem; flex-shrink: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .topic-chip { display: none; }
   .topbar { padding: 0 12px; }
 }

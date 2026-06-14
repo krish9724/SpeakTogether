@@ -23,7 +23,11 @@ let username = sessionStorage.getItem('st_username') || '';
 let currentLevel = sessionStorage.getItem('st_level') || '';
 const initialDash = JSON.parse(localStorage.getItem('st_dashboard') || '{}');
 const currentUser = JSON.parse(localStorage.getItem('st_user') || '{}');
-let userAvatar = currentUser.avatar || initialDash.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
+let sessionGender = initialDash.gender || 'other';
+let fallbackAvatar = (sessionGender === 'male' || sessionGender === 'boy') ? `https://avatar.iran.liara.run/public/boy?username=${encodeURIComponent(username)}` :
+                     (sessionGender === 'female' || sessionGender === 'girl') ? `https://avatar.iran.liara.run/public/girl?username=${encodeURIComponent(username)}` :
+                     `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
+let userAvatar = currentUser.avatar || initialDash.avatar || fallbackAvatar;
 
 let micMuted = false, camOff = false, msgCount = 0;
 let sessionSeconds = 0, sessionInterval = null;
@@ -154,6 +158,11 @@ const iceServers = {
     if (localAvatarImg) {
       localAvatarImg.src = userAvatar;
     }
+  }
+
+  const localAvatarImgEl = document.getElementById('localAvatarImg');
+  if (localAvatarImgEl) {
+    localAvatarImgEl.alt = username ? username.charAt(0).toUpperCase() : 'U';
   }
 
   // Removed dailyUsed limit blocking to allow unlimited practice sessions
@@ -411,6 +420,7 @@ socket.on('joinedRoom', async ({ roomId, isInitiator, waiting, partnerName, part
     const partnerAvatarImg = document.getElementById('partnerAvatarImg');
     if (partnerAvatarImg) {
       partnerAvatarImg.src = partnerAvatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(partnerName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffdfbf,ffd5dc`;
+      partnerAvatarImg.alt = partnerName.charAt(0).toUpperCase();
     }
   }
 
