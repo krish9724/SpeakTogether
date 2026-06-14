@@ -681,7 +681,7 @@
     .country-flag { font-size: 1.3rem; }
 
     .phone-input {
-      flex: 1; height: 52px;
+      flex: 1; height: 52px; width: 100%; min-width: 0;
       background: var(--bg); border: 1.5px solid var(--border);
       border-radius: 12px; padding: 0 16px;
       font-family: 'Inter', sans-serif; font-size: 1rem;
@@ -1329,7 +1329,13 @@
         <div id="nameFieldWrap" style="display:none">
           <input class="otp-name-input" id="otpNameInput" type="text"
             placeholder="Your full name (e.g. Krish Gupta)"
-            maxlength="50" autocomplete="name">
+            maxlength="50" autocomplete="name" style="margin-bottom:12px;">
+          <select class="otp-name-input" id="genderInput" style="appearance: auto; padding-right: 16px;">
+            <option value="" disabled selected>Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
         </div>
 
         <!-- ── GOOGLE SIGN-IN BUTTON ── -->
@@ -1822,13 +1828,24 @@
       btn.disabled = true;
       txt.textContent = 'Signing in...';
       hideError('Phone');
+      let gender = 'other';
+      if (currentAuthTab === 'signup') {
+        const genderEl = document.getElementById('genderInput');
+        if (genderEl && genderEl.value) {
+            gender = genderEl.value;
+        } else {
+            gender = window.prompt("Please enter your gender for your avatar (male/female/other):", "other") || "other";
+        }
+      }
+
       try {
-        const { user } = await window.SpeakAuth.signInWithGoogle();
+        const { user } = await window.SpeakAuth.signInWithGoogle(gender);
         showStep(3);
         const d = loadDashboard();
         d.authenticated = true;
         if (user.displayName) d.name = user.displayName;
         if (user.email)       d.email = user.email;
+        if (user.avatar)      d.avatar = user.avatar;
         d.xp            = user.xp            ?? d.xp;
         d.userLevel     = user.level          ?? d.userLevel;
         d.streak        = user.currentStreak  ?? d.streak;
@@ -1842,10 +1859,11 @@
         setTimeout(() => { closeOTPModal(); renderDrawerStats(); }, 1800);
       } catch (err) {
         console.error(err);
-        let msg = 'Google sign-in failed. Please try again.';
+        let msg = err.message || 'Google sign-in failed. Please try again.';
         if (err.code === 'auth/popup-blocked')         msg = 'Popup was blocked. Allow popups and retry.';
         if (err.code === 'auth/popup-closed-by-user')  msg = 'Sign-in cancelled. Try again.';
         if (err.code === 'auth/account-exists-with-different-credential') msg = 'Account exists with different sign-in method.';
+        if (err.message.includes('auth/')) msg = 'Firebase Auth Error: ' + err.code;
         showError('Phone', msg);
       } finally {
         btn.classList.remove('loading');
@@ -1905,10 +1923,12 @@
       const btn  = document.getElementById('otpVerifyBtn');
       const nameEl = document.getElementById('otpNameInput');
       const name   = nameEl ? nameEl.value.trim() : '';
+      const genderEl = document.getElementById('genderInput');
+      const gender = genderEl ? genderEl.value : '';
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-circle-notch spin"></i> Verifying...';
       try {
-        const { user } = await window.SpeakAuth.verifyOTP(code, name, '');
+        const { user } = await window.SpeakAuth.verifyOTP(code, name, '', gender);
 
         showStep(3);
         if (resendTimer) clearInterval(resendTimer);
@@ -1917,6 +1937,7 @@
         d.authenticated = true;
         if (user.displayName) d.name = user.displayName;
         if (user.email)       d.email = user.email;
+        if (user.avatar)      d.avatar = user.avatar;
         d.xp            = user.xp           ?? d.xp;
         d.userLevel     = user.level        ?? d.userLevel;
         d.streak        = user.currentStreak ?? d.streak;

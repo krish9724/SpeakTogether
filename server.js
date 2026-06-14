@@ -128,7 +128,7 @@ const apiLimiter = rateLimit({
  * 3. Return our JWT + user profile
  */
 app.post('/api/auth/verify-token', apiLimiter, async (req, res) => {
-    const { idToken, displayName, email } = req.body;
+    const { idToken, displayName, email, gender } = req.body;
     if (!idToken) return res.status(400).json({ error: 'idToken is required.' });
 
     if (!firebaseReady) {
@@ -154,7 +154,20 @@ app.post('/api/auth/verify-token', apiLimiter, async (req, res) => {
             // 2. Upsert user in MongoDB Atlas
             user = await User.findOne({ firebaseUid });
             if (!user) {
-                user = new User({ firebaseUid, phone, displayName: displayName || '', email: email || '' });
+                const finalGender = (gender && ['male', 'female'].includes(gender.toLowerCase())) ? gender.toLowerCase() : 'other';
+                let avatarUrl = `https://avatar.iran.liara.run/public?username=${firebaseUid}`;
+                if (finalGender === 'male') avatarUrl = `https://avatar.iran.liara.run/public/boy?username=${firebaseUid}`;
+                if (finalGender === 'female') avatarUrl = `https://avatar.iran.liara.run/public/girl?username=${firebaseUid}`;
+
+                const newUserObj = { 
+                    firebaseUid, 
+                    displayName: displayName || '', 
+                    email: email || '',
+                    gender: finalGender,
+                    avatar: avatarUrl
+                };
+                if (phone) newUserObj.phone = phone;
+                user = new User(newUserObj);
             } else {
                 if (displayName && !user.displayName) user.displayName = displayName;
                 if (email && !user.email) user.email = email;
@@ -298,7 +311,7 @@ function isRateLimited(socketId) {
     return false;
 }
 
-function enqueue(socket, level, username) {
+function enqueue(socket, level, username, avatar) {
     if (!queues.has(level)) queues.set(level, []);
     const q = queues.get(level);
     if (q.some(u => u.socketId === socket.id)) return;
@@ -310,7 +323,7 @@ function enqueue(socket, level, username) {
         L.warn(`Queue timeout — ${username} on level "${level}"`);
     }, CFG.QUEUE_TIMEOUT_MS);
 
-    q.push({ socketId: socket.id, username, joinedAt: Date.now(), _timer });
+    q.push({ socketId: socket.id, username, avatar, joinedAt: Date.now(), _timer });
     L.info(`Enqueued "${username}" -> level "${level}" (queue size: ${q.length})`);
 }
 
@@ -369,7 +382,7 @@ function leaveRoom(socketId) {
     m.roomId = null;
 }
 
-function matchOrWait(socket, level, username) {
+function matchOrWait(socket, level, username, avatar) {
     const waiting = shiftQueue(level);
     if (waiting) {
         const room = createRoom(
@@ -382,15 +395,15 @@ function matchOrWait(socket, level, username) {
 
         io.to(waiting.socketId).emit('joinedRoom', {
             roomId: room.id, isInitiator: true, waiting: false,
-            partnerName: username,
+            partnerName: username, partnerAvatar: avatar
         });
         socket.emit('joinedRoom', {
             roomId: room.id, isInitiator: false, waiting: false,
-            partnerName: waiting.username,
+            partnerName: waiting.username, partnerAvatar: waiting.avatar
         });
         L.ok(`Matched in room ${room.id} | level:"${level}"`);
     } else {
-        enqueue(socket, level, username);
+        enqueue(socket, level, username, avatar);
         socket.emit('joinedRoom', { roomId: null, isInitiator: true, waiting: true });
     }
 }
@@ -418,10 +431,11 @@ io.on('connection', socket => {
     iceBuffer.set(socket.id, []);
     L.info(`Connected — ${socket.id} (phone: ${socket.user?.phone ?? 'N/A'})`);
 
-    socket.on('joinRoom', ({ level, username }) => {
+    socket.on('joinRoom', ({ level, username, avatar }) => {
         if (isRateLimited(socket.id)) return;
         level    = clean(level, 80);
         username = clean(username, 40);
+        if (typeof avatar === 'string') avatar = avatar.slice(0, 200);
         if (!level || !username) {
             socket.emit('error', { message: 'Level and username are required.' });
             return;
@@ -439,16 +453,17 @@ io.on('connection', socket => {
         }
 
         const m = meta.get(socket.id);
-        if (m) { m.username = username; m.level = level; }
+        if (m) { m.username = username; m.level = level; m.avatar = avatar; }
         leaveRoom(socket.id);
         dequeueAll(socket.id);
-        matchOrWait(socket, level, username);
+        matchOrWait(socket, level, username, avatar);
     });
 
-    socket.on('nextPartner', ({ level, username }) => {
+    socket.on('nextPartner', ({ level, username, avatar }) => {
         if (isRateLimited(socket.id)) return;
         level    = clean(level, 80);
         username = clean(username, 40);
+        if (typeof avatar === 'string') avatar = avatar.slice(0, 200);
         if (!level || !username) return;
 
         // Validate Level Restrictions
@@ -457,11 +472,11 @@ io.on('connection', socket => {
         if (level === 'Advanced' && userLvl < 5) return;
 
         const m = meta.get(socket.id);
-        if (m) { m.username = username; m.level = level; }
+        if (m) { m.username = username; m.level = level; m.avatar = avatar; }
         leaveRoom(socket.id);
         dequeueAll(socket.id);
         iceBuffer.set(socket.id, []);
-        matchOrWait(socket, level, username);
+        matchOrWait(socket, level, username, avatar);
     });
 
     socket.on('offer', ({ offer, roomId }) => {
@@ -566,7 +581,7 @@ process.on('SIGINT',  () => gracefulShutdown('SIGINT'));
 process.on('uncaughtException',   err    => L.err('Uncaught exception', err));
 process.on('unhandledRejection',  reason => L.err('Unhandled rejection', reason));
 
-server.listen(CFG.PORT, '0.0.0.0', () => {
+server.listen(CFG.PORT, () => {
     L.ok(`SpeakTogether server running on port ${CFG.PORT}`);
 });
 

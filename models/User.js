@@ -23,6 +23,9 @@ const userSchema = new mongoose.Schema({
     // Display name (editable by user)
     displayName : { type: String, default: '', trim: true, maxlength: 50 },
 
+    // Gender for avatar logic
+    gender      : { type: String, enum: ['male', 'female', 'other'], default: 'other' },
+
     // Profile photo avatar (Base64 data or image URL)
     avatar      : { type: String, default: '' },
 

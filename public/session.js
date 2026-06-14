@@ -21,6 +21,9 @@ const socket = io();
 let localStream, peerConnection, currentRoom;
 let username = sessionStorage.getItem('st_username') || '';
 let currentLevel = sessionStorage.getItem('st_level') || '';
+const initialDash = JSON.parse(localStorage.getItem('st_dashboard') || '{}');
+let userAvatar = initialDash.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
+
 let micMuted = false, camOff = false, msgCount = 0;
 let sessionSeconds = 0, sessionInterval = null;
 let currentTopic = '';
@@ -148,7 +151,7 @@ const iceServers = {
 
     const localAvatarImg = document.getElementById('localAvatarImg');
     if (localAvatarImg) {
-      localAvatarImg.src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffdfbf,ffd5dc`;
+      localAvatarImg.src = userAvatar;
     }
   }
 
@@ -170,7 +173,7 @@ async function startSession() {
     loaderText.textContent = 'Finding a practice partner at your level...';
     if (!isVideoEnabled) document.querySelector('.video-panel').classList.add('waiting');
     nextBtn.style.display = 'flex';
-    socket.emit('joinRoom', { level: currentLevel, username });
+    socket.emit('joinRoom', { level: currentLevel, username, avatar: userAvatar });
   } catch (err) {
     loaderText.textContent = '⚠️ Microphone access denied. Check permissions.';
   }
@@ -242,7 +245,7 @@ function endSessionDueToLimit() {
   const xpResult = stopTimer();
   if (peerConnection) { peerConnection.close(); peerConnection = null; }
   if (remoteVideo.srcObject) { remoteVideo.srcObject.getTracks().forEach(t => t.stop()); remoteVideo.srcObject = null; }
-  socket.emit('nextPartner', { level: currentLevel, username });
+  socket.emit('nextPartner', { level: currentLevel, username, avatar: userAvatar });
   showExpiredModal();
 }
 
@@ -373,7 +376,7 @@ function nextPartner() {
 
   if (!isVideoEnabled) document.querySelector('.video-panel').classList.add('waiting');
 
-  socket.emit('nextPartner', { level: currentLevel, username });
+  socket.emit('nextPartner', { level: currentLevel, username, avatar: userAvatar });
 
   const constraints = isVideoEnabled
     ? { video: true, audio: true }
@@ -394,7 +397,7 @@ function sysMsg(text) {
 }
 
 // ── Socket Events ──
-socket.on('joinedRoom', async ({ roomId, isInitiator, waiting, partnerName }) => {
+socket.on('joinedRoom', async ({ roomId, isInitiator, waiting, partnerName, partnerAvatar }) => {
   currentRoom = roomId;
   if (partnerName) {
     partnerNameEl.textContent = partnerName;
@@ -403,7 +406,7 @@ socket.on('joinedRoom', async ({ roomId, isInitiator, waiting, partnerName }) =>
     
     const partnerAvatarImg = document.getElementById('partnerAvatarImg');
     if (partnerAvatarImg) {
-      partnerAvatarImg.src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(partnerName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffdfbf,ffd5dc`;
+      partnerAvatarImg.src = partnerAvatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(partnerName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffdfbf,ffd5dc`;
     }
   }
 

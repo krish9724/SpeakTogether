@@ -82,7 +82,7 @@ async function sendOTP(phoneE164) {
 // Verify OTP code entered by user
 // Returns { token, user } on success
 // ─────────────────────────────────────────────
-async function verifyOTP(code, displayName, email) {
+async function verifyOTP(code, displayName, email, gender = 'other') {
     if (!confirmationResult) throw new Error('No OTP session. Please request OTP first.');
     
     let idToken;
@@ -98,7 +98,7 @@ async function verifyOTP(code, displayName, email) {
     const res = await fetch('/api/auth/verify-token', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify({ idToken, displayName, email }),
+        body   : JSON.stringify({ idToken, displayName, email, gender }),
     });
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -201,11 +201,14 @@ function requireAuth(redirectUrl = '/') {
 // Google Sign-In via Firebase OAuth popup
 // Returns { token, user } on success
 // ─────────────────────────────────────────────
-async function signInWithGoogle() {
+async function signInWithGoogle(gender = 'other') {
     await _initFirebase();
     const provider = new window._fbGoogleProvider();
     provider.addScope('email');
     provider.addScope('profile');
+    provider.setCustomParameters({
+        prompt: 'select_account'
+    });
     const credential  = await window._fbSignInPopup(firebaseAuth, provider);
     const idToken     = await credential.user.getIdToken();
     const displayName = credential.user.displayName || '';
@@ -214,7 +217,7 @@ async function signInWithGoogle() {
     const res = await fetch('/api/auth/verify-token', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify({ idToken, displayName, email }),
+        body   : JSON.stringify({ idToken, displayName, email, gender }),
     });
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
