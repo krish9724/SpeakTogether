@@ -1732,14 +1732,14 @@
                 </div>
               </div>
               <div style="display:flex; gap:10px; flex-wrap: wrap;">
-                <button onclick="attemptChat('${item.partnerName}')" style="flex:1; min-width: 100px; padding:10px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s;">
+                <button onclick="attemptChat('${item.partnerName}')" style="flex:1; min-width: 100px; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-weight:700; font-family:'Inter',sans-serif; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s;">
                   <i class="fas fa-comment-dots" style="color:var(--primary)"></i> Message
                 </button>
-                <button class="${badgeClass}" onclick="toggleFollowInHistory(${idx})" style="flex:1; min-width: 100px; padding:10px; border-radius:12px; border:none; background:${item.followed ? 'rgba(32, 201, 151, 0.1)' : 'var(--gradient)'}; color:${item.followed ? 'var(--accent)' : '#fff'}; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s; box-shadow: ${item.followed ? 'none' : '0 4px 12px var(--glow)'};">
+                <button class="${badgeClass}" onclick="toggleFollowInHistory(${idx})" style="flex:1; min-width: 100px; padding:12px; border-radius:12px; border:none; background:${item.followed ? 'rgba(32, 201, 151, 0.1)' : 'var(--gradient)'}; color:${item.followed ? 'var(--accent)' : '#fff'}; font-weight:700; font-family:'Inter',sans-serif; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s; box-shadow: ${item.followed ? 'none' : '0 4px 12px var(--glow)'};">
                   <i class="fas ${badgeIcon}"></i> ${badgeText}
                 </button>
-                <button onclick="deleteCallHistoryUi(${idx})" style="width:44px; flex-shrink:0; border-radius:12px; border:1px solid rgba(255, 77, 77, 0.2); background:rgba(255, 77, 77, 0.05); color:var(--danger); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" title="Delete Record">
-                  <i class="fas fa-trash-alt"></i>
+                <button onclick="deleteCallHistoryUi(${idx})" style="flex:1; min-width: 100px; padding:12px; border-radius:12px; border:1px solid rgba(255, 77, 77, 0.2); background:rgba(255, 77, 77, 0.05); color:var(--danger); font-weight:700; font-family:'Inter',sans-serif; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s;" title="Delete Record">
+                  <i class="fas fa-trash-alt"></i> Delete
                 </button>
               </div>
             </div>
