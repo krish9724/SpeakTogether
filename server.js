@@ -254,6 +254,30 @@ app.patch('/api/auth/profile', apiLimiter, requireAuth, async (req, res) => {
 });
 
 /**
+ * DELETE /api/auth/history/:index
+ * Header: Authorization: Bearer <jwt>
+ * Deletes a session history item by its index
+ */
+app.delete('/api/auth/history/:index', apiLimiter, requireAuth, async (req, res) => {
+    const idx = parseInt(req.params.index, 10);
+    if (!dbReady) return res.json({ success: true });
+    try {
+        const user = await User.findOne({ firebaseUid: req.user.uid });
+        if (!user) return res.status(404).json({ error: 'User not found.' });
+        if (isNaN(idx) || idx < 0 || idx >= user.sessionHistory.length) {
+            return res.status(400).json({ error: 'Invalid index.' });
+        }
+        
+        user.sessionHistory.splice(idx, 1);
+        await user.save();
+        res.json({ success: true, sessionHistory: user.sessionHistory });
+    } catch (err) {
+        L.err('DELETE /history error', err.message);
+        res.status(500).json({ error: 'Could not delete history.' });
+    }
+});
+
+/**
  * POST /api/auth/session
  * Header: Authorization: Bearer <jwt>
  * Body: { partnerName, level, durationSec, xpEarned }

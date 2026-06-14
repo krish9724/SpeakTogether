@@ -17,12 +17,13 @@ const WARNING_AT = 180;          // 3 min (2 min remaining)
 const VIDEO_LEVELS = ['Advanced'];
 
 // ── State ──
-const socket = io();
+const socket = io({ auth: { token: localStorage.getItem('st_jwt') || '' } });
 let localStream, peerConnection, currentRoom;
 let username = sessionStorage.getItem('st_username') || '';
 let currentLevel = sessionStorage.getItem('st_level') || '';
 const initialDash = JSON.parse(localStorage.getItem('st_dashboard') || '{}');
-let userAvatar = initialDash.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
+const currentUser = JSON.parse(localStorage.getItem('st_user') || '{}');
+let userAvatar = currentUser.avatar || initialDash.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
 
 let micMuted = false, camOff = false, msgCount = 0;
 let sessionSeconds = 0, sessionInterval = null;
@@ -233,12 +234,15 @@ function stopTimer() {
     }
   }
 
-  dash.totalSeconds += sessionSeconds;
-  dash.sessions++;
-  updateStreak(dash);
-  const xpResult = addXP(dash, sessionSeconds);
-  saveDashboard(dash);
-  return xpResult;
+  if (sessionSeconds > 0) {
+    dash.totalSeconds += sessionSeconds;
+    dash.sessions++;
+    updateStreak(dash);
+    const xpResult = addXP(dash, sessionSeconds);
+    saveDashboard(dash);
+    return xpResult;
+  }
+  return { leveledUp: false, xpEarned: 0, newLevel: dash.userLevel };
 }
 
 function endSessionDueToLimit() {

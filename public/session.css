@@ -324,9 +324,13 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .xp-lock-hint i { color: var(--primary); }
 
 @media (max-width: 768px) {
-  .chat-panel { display: none; }
-  .local-wrap { width: 120px; bottom: 80px; }
-  .controls { padding: 12px; gap: 8px; flex-wrap: wrap; }
+  .chat-panel { display: none !important; }
+  .video-panel.voice-layout .local-wrap.voice-only .avatar-circle { width: 80px; height: 80px; font-size: 2.5rem; }
+  .avatar-circle { width: 80px; height: 80px; font-size: 2.5rem; }
+  .local-wrap { width: 100px; bottom: 80px; }
+  .controls { padding: 10px; gap: 6px; flex-wrap: wrap; }
+  .ctrl-btn { width: 40px; height: 40px; font-size: 0.9rem; }
+  .btn-next { height: 40px; padding: 0 16px; font-size: 0.85rem; }
   .topic-chip { display: none; }
   .topbar { padding: 0 12px; }
 }

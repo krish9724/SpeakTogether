@@ -185,6 +185,34 @@ async function recordSession({ partnerName, level, durationSec, xpEarned }) {
 }
 
 // ─────────────────────────────────────────────
+// Delete a session from history
+// ─────────────────────────────────────────────
+async function deleteCallHistory(index) {
+    const token = getToken();
+    if (!token) return false;
+    try {
+        const res = await fetch(`/api/auth/history/${index}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) return false;
+        const data = await res.json();
+        if (data.success) {
+            // Update local user state
+            const user = getUser();
+            if (user) {
+                user.sessionHistory = data.sessionHistory;
+                localStorage.setItem(USER_KEY, JSON.stringify(user));
+            }
+            return true;
+        }
+        return false;
+    } catch (_) {
+        return false;
+    }
+}
+
+// ─────────────────────────────────────────────
 // Auth guard — call on protected pages
 // Redirects to / if not authenticated
 // ─────────────────────────────────────────────
@@ -232,5 +260,5 @@ async function signInWithGoogle(gender = 'other') {
 // Expose globally
 window.SpeakAuth = {
     sendOTP, verifyOTP, signInWithGoogle, isAuthenticated, getUser,
-    getToken, signOut, refreshProfile, recordSession, requireAuth,
+    getToken, signOut, refreshProfile, recordSession, deleteCallHistory, requireAuth,
 };

@@ -1023,7 +1023,7 @@
   <!-- HERO -->
   <section class="hero">
     <div class="hero-inner">
-      <div class="hero-badge"><span class="pulse"></span> Active Practice Room</div>
+      <!-- Hero Badge Removed -->
       <h1>Speak English<br>With Confidence & <span class="gradient-text">Zero Hesitation</span></h1>
       <p class="hero-sub">Practice speaking 1-on-1 with real learners. Start with safe voice-only calls to overcome awkwardness, and unlock full video calls when you reach Advanced level!</p>
       <div class="hero-actions">
@@ -1561,6 +1561,9 @@
         if (signOutBtn) signOutBtn.style.display = 'inline-flex';
 
         // Update DOM stats
+        const drawerName = document.getElementById('drawerName');
+        if (drawerName && d.name) drawerName.textContent = d.name;
+
         document.getElementById('drawerEmail').value = d.email;
         document.getElementById('statFollowers').textContent = d.followers;
         document.getElementById('statFollowing').textContent = d.following;
@@ -1638,6 +1641,9 @@
                     <button class="${badgeClass}" onclick="toggleFollowInHistory(${idx})" style="flex:1; padding:10px; border-radius:10px; border:none; background:${item.followed ? 'rgba(32, 201, 151, 0.1)' : 'var(--gradient)'}; color:${item.followed ? 'var(--accent)' : '#fff'}; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:0.2s;">
                       <i class="fas ${badgeIcon}"></i> ${badgeText}
                     </button>
+                    <button onclick="deleteCallHistoryUi(${idx})" style="width:40px; border-radius:10px; border:1px solid rgba(255, 77, 77, 0.2); background:rgba(255, 77, 77, 0.05); color:var(--danger); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" title="Delete Record">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
                   </div>
                 </div>
               `;
@@ -1671,6 +1677,25 @@
         }
         localStorage.setItem('st_dashboard', JSON.stringify(d));
         renderDrawerStats();
+      }
+    }
+
+    async function deleteCallHistoryUi(idx) {
+      if (!confirm("Are you sure you want to delete this call record?")) return;
+      
+      const d = loadDashboard();
+      // Optimistic UI update
+      d.callHistory.splice(idx, 1);
+      localStorage.setItem('st_dashboard', JSON.stringify(d));
+      renderDrawerStats();
+      
+      // Delete on server
+      if (window.SpeakAuth && window.SpeakAuth.isAuthenticated()) {
+         const success = await window.SpeakAuth.deleteCallHistory(idx);
+         if (!success) {
+             console.error("Failed to delete history from server");
+             // You could optionally refetch profile here to restore state
+         }
       }
     }
 
@@ -1885,8 +1910,11 @@
       const isSignup = currentAuthTab === 'signup';
       const nameEl   = document.getElementById('otpNameInput');
       const name     = nameEl ? nameEl.value.trim() : '';
+      const genderEl = document.getElementById('genderInput');
+      const gender   = genderEl ? genderEl.value : '';
       const phone    = document.getElementById('phoneInput').value.trim().replace(/\s/g,'');
       if (isSignup && !name) { showError('Phone', 'Please enter your full name.'); return; }
+      if (isSignup && !gender) { showError('Phone', 'Please select your gender for your avatar.'); return; }
       if (!/^\d{7,15}$/.test(phone)) { showError('Phone', 'Enter a valid phone number (digits only).'); return; }
       const fullPhone = selectedDialCode + phone;
       const btn = document.getElementById('otpSendBtn');
